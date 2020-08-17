@@ -64,6 +64,7 @@ def loadCSVFile (file, lst, sep=";"):
     
     t1_stop = process_time() #tiempo final
     print("Tiempo de ejecución ",t1_stop-t1_start," segundos")
+  #  print(lst)
 
 def printMenu():
     """
@@ -103,43 +104,77 @@ def countElementsFilteredByColumn(criteria, column, lst):
         print("Tiempo de ejecución ",t1_stop-t1_start," segundos")
     return counter
 
-def countElementsByCriteria(criteria, column, lst):
+
+
+def countElementsByCriteria(criteria, lst, lst2):
     """
     Retorna la cantidad de elementos que cumplen con un criterio para una columna dada
+    
     """
-    return 0
+    if len(lst)==0:
+        print("La lista esta vacía")  
+        return 0
+    else:
+        t1_start = process_time() #tiempo inicial
+        conteo = 0
+        pro = 0
+        for element in lst2:
+            if criteria.lower() in element["director_name"].lower(): 
+                idp = element["id"]
+                for Monika in lst:
+                    if Monika["id"] == idp:
+                        if float(Monika["vote_average"]) >= 6:
+                            conteo += 1
+                            pro += float(Monika["vote_average"])
+        t1_stop = process_time() #tiempo final
+        if conteo == 0:
+            respuesta = "No hay peliculas"
+        else:
+            respuesta = str(conteo)+"   "+str((round((pro/conteo),2)))
+    print("Tiempo de ejecución ",t1_stop-t1_start," segundos")
+    
+    return respuesta
+    
 
 
 def main():
     """
     Método principal del programa, se encarga de manejar todos los metodos adicionales creados
-
     Instancia una lista vacia en la cual se guardarán los datos cargados desde el archivo
     Args: None
     Return: None 
     """
     lista = [] #instanciar una lista vacia
+    lista2 = []
     while True:
         printMenu() #imprimir el menu de opciones en consola
         inputs =input('Seleccione una opción para continuar\n') #leer opción ingresada
         if len(inputs)>0:
             if int(inputs[0])==1: #opcion 1
-                loadCSVFile("Data/test.csv", lista) #llamar funcion cargar datos
+                file = input(str("Ingrese el nombre del archivo: "))
+                loadCSVFile(file, lista) #llamar funcion cargar datos
                 print("Datos cargados, "+str(len(lista))+" elementos cargados")
+            if int(inputs[0])==1: #opcion 1
+                file = input(str("Ingrese nombre del documento CSV Casting: "))
+                loadCSVFile(file, lista2) #llamar funcion cargar datos
+                print("Datos cargados, "+str(len(lista))+" elementos cargados") 
             elif int(inputs[0])==2: #opcion 2
                 if len(lista)==0: #obtener la longitud de la lista
                     print("La lista esta vacía")    
                 else: print("La lista tiene "+str(len(lista))+" elementos")
             elif int(inputs[0])==3: #opcion 3
                 criteria =input('Ingrese el criterio de búsqueda\n')
-                counter=countElementsFilteredByColumn(criteria, "nombre", lista) #filtrar una columna por criterio  
-                print("Coinciden ",counter," elementos con el crtierio: ", criteria  )
+                columna = input("ingrese el titulo de la columna en la que desea buscar: ")
+                counter=countElementsFilteredByColumn(criteria, columna, lista) #filtrar una columna por criterio  
+                print("Coinciden ",counter," elementos con el crtierio: ", criteria )
             elif int(inputs[0])==4: #opcion 4
                 criteria =input('Ingrese el criterio de búsqueda\n')
-                counter=countElementsByCriteria(criteria,0,lista)
-                print("Coinciden ",counter," elementos con el crtierio: '", criteria ,"' (en construcción ...)")
+                counter=countElementsByCriteria(criteria,lista,lista2)
+                print ("El numero de peliculas que cumplen la condicion y el porcentaje son: "+ str(counter))
+                
             elif int(inputs[0])==0: #opcion 0, salir
                 sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
